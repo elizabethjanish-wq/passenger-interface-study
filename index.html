@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>Passenger Interface Evaluation</title>
+</head>
+
+<body>
+
+  <h2>Passenger Interface Evaluation</h2>
+
+  <p id="status">
+    You are being redirected to the study questionnaire.
+  </p>
+
+  <p>
+    <a id="continueLink" href="#" hidden>
+      Continue to questionnaire
+    </a>
+  </p>
+
+  <script>
+
+    // REPLACE THESE WITH YOUR MICROSOFT FORMS LINKS
+
+    const formA = "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=WaLcMRT3SEy6XKqW3PYKqhk6ko7tNs1MtPbrLO_T4olUMUhEOFlKRlpVRTc3VU83RDlKT1I0WlRWNS4u";
+    const formB = "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=WaLcMRT3SEy6XKqW3PYKqhk6ko7tNs1MtPbrLO_T4olUQ01GQzIyWkNHMFI3OVFRUTdIUDdLQjRZNy4u";
+
+    // Store assignment in this browser
+
+    const storageKey = "passenger_study_sequence_v1";
+
+    let assignment;
+
+    try {
+      assignment = localStorage.getItem(storageKey);
+    } catch (error) {
+      assignment = null;
+    }
+
+    // Randomize only when no valid assignment exists
+
+    if (assignment !== "A" && assignment !== "B") {
+
+      const randomValue = new Uint32Array(1);
+      crypto.getRandomValues(randomValue);
+
+      assignment =
+        randomValue[0] % 2 === 0 ? "A" : "B";
+
+      try {
+        localStorage.setItem(storageKey, assignment);
+      } catch (error) {
+        // Continue without persistent storage.
+      }
+
+    }
+
+    // Select corresponding questionnaire
+
+    const destination =
+      assignment === "A" ? formA : formB;
+
+    // Provide manual link as fallback
+
+    const continueLink =
+      document.getElementById("continueLink");
+
+    continueLink.href = destination;
+    continueLink.hidden = false;
+
+    // Redirect automatically
+
+    if (
+      destination.startsWith("https://") &&
+      !destination.includes("PASTE_FORM")
+    ) {
+      window.location.replace(destination);
+    } else {
+      document.getElementById("status").textContent =
+        "The questionnaire links have not been configured.";
+    }
+
+  </script>
+
+</body>
+</html>
